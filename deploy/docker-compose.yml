@@ -1,0 +1,26 @@
+# n8n (orquestração) + worker (pipeline). Os dois na mesma rede interna; só o n8n fica exposto.
+services:
+  worker:
+    build: ..
+    env_file: ../.env
+    volumes:
+      - ../channels:/app/channels
+      - ../secrets:/app/secrets
+      - ../fonts:/app/fonts
+      - ../runs:/app/runs
+      - ../data:/app/data
+    expose: ["8787"]
+    restart: unless-stopped
+
+  n8n:
+    image: n8nio/n8n:latest
+    ports: ["5678:5678"]
+    environment:
+      - GENERIC_TIMEZONE=America/Sao_Paulo
+      - TZ=America/Sao_Paulo
+    volumes:
+      - n8n_data:/home/node/.n8n
+    restart: unless-stopped
+
+volumes:
+  n8n_data:
